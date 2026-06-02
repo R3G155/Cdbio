@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDbio - BioQuiz</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+<script src="js/firebase-config.js" defer></script>
+<script src="js/auth.js" defer></script>
+
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen flex flex-col justify-between">
+
+    <header class="bg-gray-800 border-b border-gray-700 p-4 sticky top-0 z-50 shadow-md">
+        <div class="container mx-auto max-w-6xl flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="bg-blue-500 p-1.5 rounded text-gray-900"><i data-lucide="award" class="w-5 h-5"></i></div>
+                <h1 class="text-lg font-black text-blue-400">CDbio • BioQuiz</h1>
+            </div>
+            <a href="index.html" class="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg border border-gray-600 transition-colors">Voltar ao Início</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto max-w-xl flex-grow p-4 md:p-6 mb-20 flex flex-col justify-center">
+        
+        <div id="quiz-card" class="bg-gray-800 border border-gray-700 rounded-2xl p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center text-xs font-mono text-gray-400">
+                <span id="quiz-progress">Questão: 1 de 2</span>
+                <span id="quiz-score">Pontos: 0</span>
+            </div>
+            
+            <div class="w-full bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                <div id="quiz-bar" class="bg-blue-500 h-full transition-all duration-300" style="width: 50%"></div>
+            </div>
+
+            <h3 id="quiz-question" class="text-base font-bold text-gray-100 py-2">Carregando pergunta...</h3>
+
+            <div id="quiz-options" class="space-y-2.5"></div>
+            
+            <button id="btn-next" onclick="proximaPergunta()" class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition-all">
+                Avançar Próxima Questão
+            </button>
+        </div>
+    </main>
+
+    <nav class="bg-gray-800 border-t border-gray-700 fixed bottom-0 left-0 right-0 z-50">
+        <div class="container mx-auto max-w-6xl flex justify-around items-center text-center">
+            <a href="index.html" class="flex-1 py-3 text-gray-400"><i data-lucide="home" class="w-5 h-5 mx-auto mb-0.5"></i><span class="text-[10px]">Início</span></a>
+            <a href="bioquiz.html" class="flex-1 py-3 text-blue-400 font-bold border-t-2 border-blue-500"><i data-lucide="award" class="w-5 h-5 mx-auto mb-0.5"></i><span class="text-[10px]">Quizzes</span></a>
+            <a href="biosimuladores.html" class="flex-1 py-3 text-gray-400"><i data-lucide="flask-conical" class="w-5 h-5 mx-auto mb-0.5"></i><span class="text-[10px]">Simuladores</span></a>
+            <a href="biogames.html" class="flex-1 py-3 text-gray-400"><i data-lucide="gamepad-2" class="w-5 h-5 mx-auto mb-0.5"></i><span class="text-[10px]">Jogos</span></a>
+            <a href="bioslides.html" class="flex-1 py-3 text-gray-400"><i data-lucide="presentation" class="w-5 h-5 mx-auto mb-0.5"></i><span class="text-[10px]">Slides</span></a>
+        </div>
+    </nav>
+
+    <script>
+        // ========================================================
+        // ✍️ COMAQUI: ÁREA EDITÁVEL (ADICIONE OU ALTERE AS PERGUNTAS)
+        // O campo 'correta' deve bater exatamente com o índice da resposta (0=A, 1=B, 2=C, 3=D)
+        // ========================================================
+      const BANCO_PERGUNTAS = [
+    {
+        pergunta: "Qual organela celular é responsável pela produção de energia (ATP) através da respiração celular?",
+        opcoes: ["Complexo de Golgi", "Mitocôndria", "Ribossomo", "Lisossomo"],
+        correta: 1 // (Significa que a resposta certa é a Mitocôndria, pois a contagem começa em 0)
+    },
+    {
+        pergunta: "Quem é considerado o pai da genética clássica devido aos seus estudos com ervilhas?",
+        opcoes: ["Charles Darwin", "Louis Pasteur", "Gregor Mendel", "Carl Linnaeus"],
+        correta: 2 // (Resposta certa: Gregor Mendel)
+    },
+    // ✍️ ADICIONEI MAIS UMA AQUI ABAIXO COMO EXEMPLO:
+    {
+        pergunta: "Qual das alternativas representa uma característica exclusiva das células vegetais?",
+        opcoes: ["Membrana Plasmática", "Lisossomos", "Parede Celular de Celulose", "Ribossomos"],
+        correta: 2 // (Resposta certa: Parede Celular de Celulose)
+    }
+];
+
+        let indexAtual = 0;
+        let pontuacao = 0;
+        let respondeu = false;
+
+        function carregarQuestao() {
+            respondeu = false;
+            document.getElementById('btn-next').classList.add('hidden');
+            
+            const q = BANCO_PERGUNTAS[indexAtual];
+            document.getElementById('quiz-progress').innerText = `Questão: ${indexAtual + 1} de ${BANCO_PERGUNTAS.length}`;
+            document.getElementById('quiz-score').innerText = `Pontos: ${pontuacao}`;
+            document.getElementById('quiz-bar').style.width = `${((indexAtual + 1) / BANCO_PERGUNTAS.length) * 100}%`;
+            document.getElementById('quiz-question').innerText = q.pergunta;
+
+            const containerOpcoes = document.getElementById('quiz-options');
+            containerOpcoes.innerHTML = q.opcoes.map((opcao, i) => `
+                <button onclick="verificarResposta(${i})" class="w-full text-left p-3 bg-gray-900 border border-gray-700 rounded-xl text-xs hover:border-blue-500 transition-all block option-btn">
+                    ${opcao}
+                </button>
+            `).join('');
+        }
+
+        function verificarResposta(opcaoSelecionada) {
+            if (respondeu) return; // evita duplo clique
+            respondeu = true;
+            
+            const q = BANCO_PERGUNTAS[indexAtual];
+            const botoes = document.querySelectorAll('.option-btn');
+
+            if (opcaoSelecionada === q.correta) {
+                botoes[opcaoSelecionada].className = "w-full text-left p-3 bg-emerald-950 border border-emerald-500 text-emerald-400 rounded-xl text-xs font-bold block";
+                pontuacao += 10;
+                document.getElementById('quiz-score').innerText = `Pontos: ${pontuacao}`;
+            } else {
+                botoes[opcaoSelecionada].className = "w-full text-left p-3 bg-red-950 border border-red-500 text-red-400 rounded-xl text-xs font-bold block";
+                botoes[q.correta].className = "w-full text-left p-3 bg-emerald-950 border border-emerald-500 text-emerald-400 rounded-xl text-xs font-bold block";
+            }
+
+            document.getElementById('btn-next').classList.remove('hidden');
+        }
+
+        function proximaPergunta() {
+            if (indexAtual + 1 < BANCO_PERGUNTAS.length) {
+                indexAtual++;
+                carregarQuestao();
+            } else {
+                // Fim do quiz
+                document.getElementById('quiz-card').innerHTML = `
+                    <div class="text-center py-6 space-y-3">
+                        <div class="text-5xl">🏆</div>
+                        <h3 class="text-xl font-black text-blue-400">Quiz Concluído!</h3>
+                        <p class="text-xs text-gray-400">Você finalizou o teste com sucesso.</p>
+                        <div class="bg-gray-900 p-3 rounded-xl border border-gray-700 inline-block font-mono text-sm text-emerald-400 font-bold">
+                            Pontuação Final: ${pontuacao} Pontos
+                        </div>
+                        <button onclick="location.reload()" class="block mx-auto mt-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-xs font-bold">
+                            Refazer Quiz
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        carregarQuestao();
+        lucide.createIcons();
+    </script>
+</body>
+</html>
