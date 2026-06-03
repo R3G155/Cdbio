@@ -4,148 +4,215 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CDbio - BioQuiz</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-<script src="js/firebase-config.js" defer></script>
-<script src="js/auth.js" defer></script>
-
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="js/firebase-config.js" defer></script>
+    <script src="js/auth.js" defer></script>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans min-h-screen flex flex-col justify-between">
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen flex flex-col">
 
     <header class="bg-gray-800 border-b border-gray-700 p-4 sticky top-0 z-50 shadow-md">
         <div class="container mx-auto max-w-6xl flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <div class="bg-blue-500 p-1.5 rounded text-gray-900"><i data-lucide="award" class="w-5 h-5"></i></div>
-                <h1 class="text-lg font-black text-blue-400">CDbio • BioQuiz</h1>
+            <div class="flex items-center space-x-3">
+                <img src="img/logo.png" alt="Logo" class="h-8 object-contain">
+                <h1 class="text-lg font-black text-blue-400">BioQuiz</h1>
             </div>
-            <a href="index.html" class="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg border border-gray-600 transition-colors">Voltar ao Início</a>
+            <a href="index.html" class="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg border border-gray-600 transition-colors">Voltar</a>
         </div>
     </header>
 
-    <main class="container mx-auto max-w-xl flex-grow p-4 md:p-6 mb-20 flex flex-col justify-center">
+    <main class="container mx-auto max-w-2xl flex-grow p-4 md:p-6 mb-20">
         
-        <div id="quiz-card" class="bg-gray-800 border border-gray-700 rounded-2xl p-6 shadow-2xl space-y-4">
+        <!-- TELA 1: LISTA DE NICHOS (CATEGORIAS) -->
+        <div id="tela-nichos" class="space-y-6">
+            <div class="border-b border-gray-700 pb-3">
+                <h2 class="text-xl font-bold text-blue-400">Escolha um Tópico</h2>
+                <p class="text-gray-400 text-xs">Selecione o nicho que deseja praticar agora.</p>
+            </div>
+            <div id="container-nichos" class="grid sm:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- TELA 2: O QUIZ EM SI (Fica escondido até clicar no nicho) -->
+        <div id="tela-quiz" class="hidden bg-gray-800 border border-gray-700 rounded-2xl p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center pb-3 border-b border-gray-700">
+                <h3 id="quiz-titulo-nicho" class="font-bold text-blue-400 text-sm uppercase tracking-wider">Tópico</h3>
+                <button onclick="voltarParaNichos()" class="text-xs text-gray-400 hover:text-white flex items-center gap-1"><i data-lucide="x" class="w-4 h-4"></i> Cancelar</button>
+            </div>
+            
             <div class="flex justify-between items-center text-xs font-mono text-gray-400">
-                <span id="quiz-progress">Questão: 1 de 2</span>
+                <span id="quiz-progress">Questão: 1 de X</span>
                 <span id="quiz-score">Pontos: 0</span>
             </div>
             
             <div class="w-full bg-gray-700 h-1.5 rounded-full overflow-hidden">
-                <div id="quiz-bar" class="bg-blue-500 h-full transition-all duration-300" style="width: 50%"></div>
+                <div id="quiz-bar" class="bg-blue-500 h-full transition-all duration-300" style="width: 0%"></div>
             </div>
 
             <h3 id="quiz-question" class="text-base font-bold text-gray-100 py-2">Carregando pergunta...</h3>
-
             <div id="quiz-options" class="space-y-2.5"></div>
             
-            <button id="btn-next" onclick="proximaPergunta()" class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs transition-all">
+            <button id="btn-next" onclick="proximaPergunta()" class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-xs transition-all">
                 Avançar Próxima Questão
             </button>
         </div>
-    </main>
 
-    <nav class="bg-gray-800 border-t border-gray-700 fixed bottom-0 left-0 right-0 z-50">
-        <div class="container mx-auto max-w-6xl flex justify-around items-center text-center">
-            <a href="index.html" class="flex-1 py-3 text-gray-400"><i data-lucide="home" class="w-5 h-5 mx-auto mb-0.5"></i><span class="text-[10px]">Início</span></a>
-            <a href="bioquiz.html" class="flex-1 py-3 text-blue-400 font-bold border-t-2 border-blue-500"><i data-lucide="award" class="w-5 h-5 mx-auto mb-0.5"></i><span class="text-[10px]">Quizzes</span></a>
-            <a href="biosimuladores.html" class="flex-1 py-3 text-gray-400"><i data-lucide="flask-conical" class="w-5 h-5 mx-auto mb-0.5"></i><span class="text-[10px]">Simuladores</span></a>
-            <a href="biogames.html" class="flex-1 py-3 text-gray-400"><i data-lucide="gamepad-2" class="w-5 h-5 mx-auto mb-0.5"></i><span class="text-[10px]">Jogos</span></a>
-            <a href="bioslides.html" class="flex-1 py-3 text-gray-400"><i data-lucide="presentation" class="w-5 h-5 mx-auto mb-0.5"></i><span class="text-[10px]">Slides</span></a>
-        </div>
-    </nav>
+    </main>
 
     <script>
         // ========================================================
-        // ✍️ COMAQUI: ÁREA EDITÁVEL (ADICIONE OU ALTERE AS PERGUNTAS)
-        // O campo 'correta' deve bater exatamente com o índice da resposta (0=A, 1=B, 2=C, 3=D)
+        // ✍️ ÁREA EDITÁVEL: OS SEUS NICHOS DE QUIZ
+        // Cada bloco é um nicho novo. Dentro dele tem as "perguntas".
         // ========================================================
-      const BANCO_PERGUNTAS = [
-    {
-        pergunta: "Qual organela celular é responsável pela produção de energia (ATP) através da respiração celular?",
-        opcoes: ["Complexo de Golgi", "Mitocôndria", "Ribossomo", "Lisossomo"],
-        correta: 1 // (Significa que a resposta certa é a Mitocôndria, pois a contagem começa em 0)
-    },
-    {
-        pergunta: "Quem é considerado o pai da genética clássica devido aos seus estudos com ervilhas?",
-        opcoes: ["Charles Darwin", "Louis Pasteur", "Gregor Mendel", "Carl Linnaeus"],
-        correta: 2 // (Resposta certa: Gregor Mendel)
-    },
-    // ✍️ ADICIONEI MAIS UMA AQUI ABAIXO COMO EXEMPLO:
-    {
-        pergunta: "Qual das alternativas representa uma característica exclusiva das células vegetais?",
-        opcoes: ["Membrana Plasmática", "Lisossomos", "Parede Celular de Celulose", "Ribossomos"],
-        correta: 2 // (Resposta certa: Parede Celular de Celulose)
-    }
-];
+        const NICHOS_QUIZ = [
+            {
+                id: "citologia",
+                titulo: "Citologia Celular",
+                descricao: "Teste seus conhecimentos sobre membranas e organelas.",
+                icone: "microscope",
+                cor: "blue",
+                perguntas: [
+                    {
+                        pergunta: "Qual organela é responsável pela produção de energia (ATP)?",
+                        opcoes: ["Complexo de Golgi", "Mitocôndria", "Ribossomo", "Lisossomo"],
+                        correta: 1 
+                    },
+                    {
+                        pergunta: "A digestão intracelular é função de qual organela?",
+                        opcoes: ["Lisossomos", "Cloroplastos", "Nucléolo", "Retículo Endoplasmático Liso"],
+                        correta: 0
+                    }
+                ]
+            },
+            {
+                id: "genetica",
+                titulo: "Genética Clássica",
+                descricao: "Leis de Mendel, DNA, RNA e hereditariedade.",
+                icone: "dna",
+                cor: "emerald",
+                perguntas: [
+                    {
+                        pergunta: "Quem é considerado o pai da genética clássica?",
+                        opcoes: ["Charles Darwin", "Louis Pasteur", "Gregor Mendel", "Carl Linnaeus"],
+                        correta: 2
+                    },
+                    {
+                        pergunta: "Qual base nitrogenada NÃO está presente no RNA?",
+                        opcoes: ["Adenina", "Uracila", "Citosina", "Timina"],
+                        correta: 3
+                    }
+                ]
+            }
+        ];
 
+        // Variáveis de controle do jogo
+        let perguntasAtuais = [];
         let indexAtual = 0;
         let pontuacao = 0;
         let respondeu = false;
 
+        // 1. Mostrar os Cards de Nichos na tela
+        function renderizarNichos() {
+            const container = document.getElementById('container-nichos');
+            container.innerHTML = NICHOS_QUIZ.map((nicho, index) => `
+                <div onclick="iniciarQuiz(${index})" class="cursor-pointer bg-gray-800 border border-gray-700 rounded-xl p-5 shadow-lg hover:border-${nicho.cor}-500 transition-all group">
+                    <div class="text-${nicho.cor}-500 bg-${nicho.cor}-950 p-3 rounded-lg inline-block mb-3 group-hover:scale-110 transition-transform">
+                        <i data-lucide="${nicho.icone}" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="font-bold text-gray-100">${nicho.titulo}</h3>
+                    <p class="text-xs text-gray-400 mt-1">${nicho.descricao}</p>
+                    <div class="mt-4 text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded inline-block">
+                        ${nicho.perguntas.length} Questões
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        // 2. Iniciar o Quiz escolhido
+        function iniciarQuiz(nichoIndex) {
+            const nicho = NICHOS_QUIZ[nichoIndex];
+            perguntasAtuais = nicho.perguntas;
+            indexAtual = 0;
+            pontuacao = 0;
+
+            document.getElementById('tela-nichos').classList.add('hidden');
+            document.getElementById('tela-quiz').classList.remove('hidden');
+            document.getElementById('quiz-titulo-nicho').innerText = nicho.titulo;
+
+            carregarQuestao();
+        }
+
+        // 3. Voltar para a tela inicial
+        function voltarParaNichos() {
+            document.getElementById('tela-quiz').classList.add('hidden');
+            document.getElementById('tela-nichos').classList.remove('hidden');
+        }
+
+        // 4. Carregar a pergunta atual do Nicho
         function carregarQuestao() {
             respondeu = false;
             document.getElementById('btn-next').classList.add('hidden');
             
-            const q = BANCO_PERGUNTAS[indexAtual];
-            document.getElementById('quiz-progress').innerText = `Questão: ${indexAtual + 1} de ${BANCO_PERGUNTAS.length}`;
+            const q = perguntasAtuais[indexAtual];
+            document.getElementById('quiz-progress').innerText = `Questão: ${indexAtual + 1} de ${perguntasAtuais.length}`;
             document.getElementById('quiz-score').innerText = `Pontos: ${pontuacao}`;
-            document.getElementById('quiz-bar').style.width = `${((indexAtual + 1) / BANCO_PERGUNTAS.length) * 100}%`;
+            document.getElementById('quiz-bar').style.width = `${((indexAtual + 1) / perguntasAtuais.length) * 100}%`;
             document.getElementById('quiz-question').innerText = q.pergunta;
 
             const containerOpcoes = document.getElementById('quiz-options');
             containerOpcoes.innerHTML = q.opcoes.map((opcao, i) => `
-                <button onclick="verificarResposta(${i})" class="w-full text-left p-3 bg-gray-900 border border-gray-700 rounded-xl text-xs hover:border-blue-500 transition-all block option-btn">
+                <button onclick="verificarResposta(${i})" class="w-full text-left p-3.5 bg-gray-900 border border-gray-700 rounded-xl text-sm hover:border-blue-500 transition-all block option-btn shadow-sm">
                     ${opcao}
                 </button>
             `).join('');
         }
 
+        // 5. Avaliar a resposta clicada
         function verificarResposta(opcaoSelecionada) {
-            if (respondeu) return; // evita duplo clique
+            if (respondeu) return;
             respondeu = true;
             
-            const q = BANCO_PERGUNTAS[indexAtual];
+            const q = perguntasAtuais[indexAtual];
             const botoes = document.querySelectorAll('.option-btn');
 
             if (opcaoSelecionada === q.correta) {
-                botoes[opcaoSelecionada].className = "w-full text-left p-3 bg-emerald-950 border border-emerald-500 text-emerald-400 rounded-xl text-xs font-bold block";
+                botoes[opcaoSelecionada].className = "w-full text-left p-3.5 bg-emerald-950 border border-emerald-500 text-emerald-400 rounded-xl text-sm font-bold block shadow-sm";
                 pontuacao += 10;
                 document.getElementById('quiz-score').innerText = `Pontos: ${pontuacao}`;
             } else {
-                botoes[opcaoSelecionada].className = "w-full text-left p-3 bg-red-950 border border-red-500 text-red-400 rounded-xl text-xs font-bold block";
-                botoes[q.correta].className = "w-full text-left p-3 bg-emerald-950 border border-emerald-500 text-emerald-400 rounded-xl text-xs font-bold block";
+                botoes[opcaoSelecionada].className = "w-full text-left p-3.5 bg-red-950 border border-red-500 text-red-400 rounded-xl text-sm font-bold block shadow-sm";
+                botoes[q.correta].className = "w-full text-left p-3.5 bg-emerald-950 border border-emerald-500 text-emerald-400 rounded-xl text-sm font-bold block shadow-sm";
             }
 
             document.getElementById('btn-next').classList.remove('hidden');
         }
 
+        // 6. Avançar para a próxima pergunta ou finalizar
         function proximaPergunta() {
-            if (indexAtual + 1 < BANCO_PERGUNTAS.length) {
+            if (indexAtual + 1 < perguntasAtuais.length) {
                 indexAtual++;
                 carregarQuestao();
             } else {
-                // Fim do quiz
-                document.getElementById('quiz-card').innerHTML = `
-                    <div class="text-center py-6 space-y-3">
-                        <div class="text-5xl">🏆</div>
-                        <h3 class="text-xl font-black text-blue-400">Quiz Concluído!</h3>
-                        <p class="text-xs text-gray-400">Você finalizou o teste com sucesso.</p>
-                        <div class="bg-gray-900 p-3 rounded-xl border border-gray-700 inline-block font-mono text-sm text-emerald-400 font-bold">
-                            Pontuação Final: ${pontuacao} Pontos
+                document.getElementById('tela-quiz').innerHTML = `
+                    <div class="text-center py-8 space-y-4">
+                        <div class="text-6xl animate-bounce">🏆</div>
+                        <h3 class="text-2xl font-black text-blue-400">Tópico Finalizado!</h3>
+                        <p class="text-sm text-gray-400">Você concluiu todas as questões deste nicho.</p>
+                        <div class="bg-gray-900 p-4 rounded-xl border border-gray-700 inline-block text-lg text-emerald-400 font-bold w-full max-w-xs shadow-inner">
+                            Pontuação Final: ${pontuacao}
                         </div>
-                        <button onclick="location.reload()" class="block mx-auto mt-4 px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-xs font-bold">
-                            Refazer Quiz
+                        <button onclick="location.reload()" class="block w-full max-w-xs mx-auto mt-6 px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-bold transition-all shadow-md">
+                            Voltar aos Tópicos
                         </button>
                     </div>
                 `;
             }
         }
 
-        carregarQuestao();
-        lucide.createIcons();
+        // Inicializa desenhando a tela inicial
+        renderizarNichos();
     </script>
 </body>
 </html>
