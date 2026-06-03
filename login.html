@@ -13,10 +13,8 @@
 </head>
 <body class="bg-gray-900 text-gray-100 font-sans min-h-screen flex items-center justify-center p-4">
 
-    <!-- CARD DE LOGIN -->
     <div class="bg-gray-800 border border-gray-700 rounded-2xl p-6 w-full max-w-md shadow-2xl space-y-6">
         <div class="text-center space-y-3">
-            <!-- LOGO OFICIAL CDBIO -->
             <div class="mx-auto flex justify-center items-center">
                 <img src="img/logo.png" alt="Logo CDbio" class="h-16 w-auto object-contain drop-shadow-lg">
             </div>
@@ -26,7 +24,6 @@
             </div>
         </div>
 
-        <!-- FORMULÁRIO -->
         <form class="space-y-4" onsubmit="fazerLogin(event)">
             <div>
                 <label class="text-xs text-gray-400 block mb-1 font-semibold">E-mail</label>
@@ -37,7 +34,12 @@
                     <label class="text-xs text-gray-400 font-semibold">Senha</label>
                     <button type="button" onclick="abrirModal()" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-medium hover:underline transition-colors">Esqueceu a senha?</button>
                 </div>
-                <input type="password" id="login-senha" required class="w-full bg-gray-900 border border-gray-600 rounded-lg p-2.5 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors">
+                <div class="relative flex items-center">
+                    <input type="password" id="login-senha" required class="w-full bg-gray-900 border border-gray-600 rounded-lg p-2.5 pr-10 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors">
+                    <button type="button" onclick="alternarVisibilidadeSenha()" class="absolute right-3 text-gray-400 hover:text-gray-200 focus:outline-none flex items-center">
+                        <i id="icone-olho" data-lucide="eye" class="w-4 h-4"></i>
+                    </button>
+                </div>
             </div>
             <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-600 text-gray-900 font-bold py-2.5 rounded-lg text-sm transition-all shadow-md active:scale-[0.98]">
                 Entrar na Plataforma
@@ -49,7 +51,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE RECUPERAÇÃO DE SENHA -->
     <div id="modal-esqueci" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity">
         <div class="bg-gray-800 border border-gray-700 w-full max-w-sm rounded-2xl p-5 space-y-4 relative shadow-2xl animate-in fade-in zoom-in-95 duration-200">
             <div>
@@ -73,6 +74,22 @@
         // Inicializa os ícones do Lucide
         lucide.createIcons();
 
+        // Lógica para alternar a visibilidade da senha
+        function alternarVisibilidadeSenha() {
+            const campoSenha = document.getElementById('login-senha');
+            const iconeOlho = document.getElementById('icone-olho');
+            
+            if (campoSenha.type === 'password') {
+                campoSenha.type = 'text';
+                iconeOlho.setAttribute('data-lucide', 'eye-off');
+            } else {
+                campoSenha.type = 'password';
+                iconeOlho.setAttribute('data-lucide', 'eye');
+            }
+            // Força o Lucide a redesenhar o ícone alterado (de eye para eye-off ou vice-versa)
+            lucide.createIcons();
+        }
+
         // Autenticação com Firebase Auth
         function fazerLogin(event) {
             event.preventDefault();
@@ -81,7 +98,6 @@
 
             firebase.auth().signInWithEmailAndPassword(email, senha)
                 .then((userCredential) => {
-                    // Redireciona para o index logado
                     window.location.href = "index.html";
                 })
                 .catch((error) => {
