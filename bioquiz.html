@@ -11,19 +11,21 @@
     <script src="js/firebase-config.js" defer></script>
     <script src="js/auth.js" defer></script>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans min-h-screen flex flex-col">
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen flex flex-col justify-between">
 
+    <!-- HEADER -->
     <header class="bg-gray-800 border-b border-gray-700 p-4 sticky top-0 z-50 shadow-md">
         <div class="container mx-auto max-w-6xl flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <img src="img/logo.png" alt="Logo" class="h-8 object-contain">
+                <img src="img/logo.png" alt="Logo CDbio" class="h-8 w-auto object-contain">
                 <h1 class="text-lg font-black text-blue-400">BioQuiz</h1>
             </div>
             <a href="index.html" class="text-xs bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-lg border border-gray-600 transition-colors">Voltar</a>
         </div>
     </header>
 
-    <main class="container mx-auto max-w-2xl flex-grow p-4 md:p-6 mb-20">
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="container mx-auto max-w-2xl flex-grow p-4 md:p-6 mb-24">
         
         <!-- TELA 1: LISTA DE NICHOS (CATEGORIAS) -->
         <div id="tela-nichos" class="space-y-6">
@@ -34,11 +36,13 @@
             <div id="container-nichos" class="grid sm:grid-cols-2 gap-4"></div>
         </div>
 
-        <!-- TELA 2: O QUIZ EM SI (Fica escondido até clicar no nicho) -->
+        <!-- TELA 2: O QUIZ EM SI -->
         <div id="tela-quiz" class="hidden bg-gray-800 border border-gray-700 rounded-2xl p-6 shadow-2xl space-y-4">
             <div class="flex justify-between items-center pb-3 border-b border-gray-700">
                 <h3 id="quiz-titulo-nicho" class="font-bold text-blue-400 text-sm uppercase tracking-wider">Tópico</h3>
-                <button onclick="voltarParaNichos()" class="text-xs text-gray-400 hover:text-white flex items-center gap-1"><i data-lucide="x" class="w-4 h-4"></i> Cancelar</button>
+                <button onclick="voltarParaNichos()" class="text-xs text-gray-400 hover:text-white flex items-center gap-1">
+                    <i data-lucide="x" class="w-4 h-4"></i> Cancelar
+                </button>
             </div>
             
             <div class="flex justify-between items-center text-xs font-mono text-gray-400">
@@ -57,31 +61,32 @@
                 Avançar Próxima Questão
             </button>
         </div>
+    </main>
 
-<nav class="bg-gray-800 border-t border-gray-700 fixed bottom-0 left-0 right-0 z-50">
+    <!-- NAV BAR FIXA INFERIOR PADRONIZADA -->
+    <nav class="bg-gray-800 border-t border-gray-700 fixed bottom-0 left-0 right-0 z-50">
         <div class="container mx-auto max-w-6xl flex justify-around items-center text-center">
-            <a href="index.html" class="flex-1 py-3 text-emerald-400 font-bold border-t-2 border-emerald-500 flex flex-col items-center justify-center">
+            <a href="index.html" class="flex-1 py-3 text-gray-400 hover:text-emerald-400 flex flex-col items-center justify-center hover:bg-gray-700/50 transition-colors">
                 <i data-lucide="home" class="w-5 h-5 mb-0.5"></i><span class="text-[10px]">Início</span>
             </a>
-            <a href="bioquiz.html" class="flex-1 py-3 text-gray-400 hover:text-blue-400 flex flex-col items-center justify-center">
+            <a href="bioquiz.html" class="flex-1 py-3 text-blue-400 font-bold border-t-2 border-blue-500 flex flex-col items-center justify-center hover:bg-gray-700/50 transition-colors">
                 <i data-lucide="award" class="w-5 h-5 mb-0.5"></i><span class="text-[10px]">Quizzes</span>
             </a>
-            <a href="biosimuladores.html" class="flex-1 py-3 text-gray-400 hover:text-emerald-400 flex flex-col items-center justify-center">
+            <a href="biosimuladores.html" class="flex-1 py-3 text-gray-400 hover:text-emerald-400 flex flex-col items-center justify-center hover:bg-gray-700/50 transition-colors">
                 <i data-lucide="flask-conical" class="w-5 h-5 mb-0.5"></i><span class="text-[10px]">Simuladores</span>
             </a>
-            <a href="biogames.html" class="flex-1 py-3 text-gray-400 hover:text-purple-400 flex flex-col items-center justify-center">
+            <a href="biogames.html" class="flex-1 py-3 text-gray-400 hover:text-purple-400 flex flex-col items-center justify-center hover:bg-gray-700/50 transition-colors">
                 <i data-lucide="gamepad-2" class="w-5 h-5 mb-0.5"></i><span class="text-[10px]">Jogos</span>
             </a>
-                        <a href="bioslides.html" class="flex-1 py-3 text-gray-400"><i data-lucide="presentation" class="w-5 h-5 mx-auto mb-0.5"></i><span class="text-[10px]">Slides</span></a>
-
+            <a href="bioslides.html" class="flex-1 py-3 text-gray-400 hover:text-amber-400 flex flex-col items-center justify-center hover:bg-gray-700/50 transition-colors">
+                <i data-lucide="presentation" class="w-5 h-5 mb-0.5"></i><span class="text-[10px]">Slides</span>
+            </a>
         </div>
-        
-    </main>
+    </nav>
 
     <script>
         // ========================================================
         // ✍️ ÁREA EDITÁVEL: OS SEUS NICHOS DE QUIZ
-        // Cada bloco é um nicho novo. Dentro dele tem as "perguntas".
         // ========================================================
         const NICHOS_QUIZ = [
             {
@@ -89,7 +94,8 @@
                 titulo: "Citologia Celular",
                 descricao: "Teste seus conhecimentos sobre membranas e organelas.",
                 icone: "microscope",
-                cor: "blue",
+                bordaHover: "hover:border-blue-500",
+                bgIcone: "bg-blue-950 text-blue-400",
                 perguntas: [
                     {
                         pergunta: "Qual organela é responsável pela produção de energia (ATP)?",
@@ -108,7 +114,8 @@
                 titulo: "Genética Clássica",
                 descricao: "Leis de Mendel, DNA, RNA e hereditariedade.",
                 icone: "dna",
-                cor: "emerald",
+                bordaHover: "hover:border-emerald-500",
+                bgIcone: "bg-emerald-950 text-emerald-400",
                 perguntas: [
                     {
                         pergunta: "Quem é considerado o pai da genética clássica?",
@@ -124,18 +131,16 @@
             }
         ];
 
-        // Variáveis de controle do jogo
         let perguntasAtuais = [];
         let indexAtual = 0;
         let pontuacao = 0;
         let respondeu = false;
 
-        // 1. Mostrar os Cards de Nichos na tela
         function renderizarNichos() {
             const container = document.getElementById('container-nichos');
             container.innerHTML = NICHOS_QUIZ.map((nicho, index) => `
-                <div onclick="iniciarQuiz(${index})" class="cursor-pointer bg-gray-800 border border-gray-700 rounded-xl p-5 shadow-lg hover:border-${nicho.cor}-500 transition-all group">
-                    <div class="text-${nicho.cor}-500 bg-${nicho.cor}-950 p-3 rounded-lg inline-block mb-3 group-hover:scale-110 transition-transform">
+                <div onclick="iniciarQuiz(${index})" class="cursor-pointer bg-gray-800 border border-gray-700 rounded-xl p-5 shadow-lg ${nicho.bordaHover} transition-all group">
+                    <div class="${nicho.bgIcone} p-3 rounded-lg inline-block mb-3 group-hover:scale-110 transition-transform">
                         <i data-lucide="${nicho.icone}" class="w-6 h-6"></i>
                     </div>
                     <h3 class="font-bold text-gray-100">${nicho.titulo}</h3>
@@ -148,7 +153,6 @@
             lucide.createIcons();
         }
 
-        // 2. Iniciar o Quiz escolhido
         function iniciarQuiz(nichoIndex) {
             const nicho = NICHOS_QUIZ[nichoIndex];
             perguntasAtuais = nicho.perguntas;
@@ -162,13 +166,14 @@
             carregarQuestao();
         }
 
-        // 3. Voltar para a tela inicial
-        function voltarParaNichos() {
+        function volverParaNichos() {
             document.getElementById('tela-quiz').classList.add('hidden');
             document.getElementById('tela-nichos').classList.remove('hidden');
         }
+        
+        // Mapeia o clique do botão interno de voltar
+        window.voltarParaNichos = volverParaNichos;
 
-        // 4. Carregar a pergunta atual do Nicho
         function carregarQuestao() {
             respondeu = false;
             document.getElementById('btn-next').classList.add('hidden');
@@ -187,7 +192,6 @@
             `).join('');
         }
 
-        // 5. Avaliar a resposta clicada
         function verificarResposta(opcaoSelecionada) {
             if (respondeu) return;
             respondeu = true;
@@ -207,7 +211,6 @@
             document.getElementById('btn-next').classList.remove('hidden');
         }
 
-        // 6. Avançar para a próxima pergunta ou finalizar
         function proximaPergunta() {
             if (indexAtual + 1 < perguntasAtuais.length) {
                 indexAtual++;
@@ -229,7 +232,6 @@
             }
         }
 
-        // Inicializa desenhando a tela inicial
         renderizarNichos();
     </script>
 </body>
