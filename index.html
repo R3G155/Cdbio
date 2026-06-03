@@ -31,9 +31,14 @@
                 <h2 class="text-2xl font-black text-emerald-400">Bem-vindo ao Complexo Digital Biológico!</h2>
                 <p class="text-sm text-gray-400 max-w-xl">Use o menu fixo abaixo para navegar instantaneamente entre os nossos módulos de estudo, simulações laboratoriais e jogos adaptados.</p>
             </div>
-            <div class="mt-4 md:mt-0 bg-gray-900/60 p-4 rounded-xl border border-gray-700 text-center shrink-0">
-                <span class="block text-[10px] uppercase text-gray-500 font-bold tracking-widest">Seu Status</span>
-                <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full font-bold inline-block mt-1">Sessão Ativa</span>
+            
+            <!-- BLOCO DE STATUS E USUÁRIO ATUALIZADO -->
+            <div class="mt-4 md:mt-0 bg-gray-900/60 p-4 rounded-xl border border-gray-700 text-center shrink-0 min-w-[160px]">
+                <span class="block text-[10px] uppercase text-gray-500 font-bold tracking-widest">Usuário</span>
+                <span id="user-display-name" class="block text-sm font-bold text-gray-200 mt-0.5 truncate max-w-[180px]">Carregando...</span>
+                <span class="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-800 px-2.5 py-0.5 rounded-full font-bold inline-flex items-center gap-1 mt-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Sessão Ativa
+                </span>
             </div>
         </div>
 
@@ -77,6 +82,20 @@
         </div>
     </nav>
 
-    <script>lucide.createIcons();</script>
+    <script>
+        lucide.createIcons();
+
+        // Monitora o estado da autenticação para capturar o usuário ativo
+        firebase.auth().onAuthStateChanged((user) => {
+            const userNameSpan = document.getElementById('user-display-name');
+            if (user) {
+                // Se o usuário tiver um nome cadastrado, usa ele. Se não, extrai o nome do e-mail.
+                const username = user.displayName || user.email.split('@')[0];
+                userNameSpan.textContent = username;
+            } else {
+                userNameSpan.textContent = "Visitante";
+            }
+        });
+    </script>
 </body>
 </html>
